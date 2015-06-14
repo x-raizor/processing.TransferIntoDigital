@@ -1,34 +1,50 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class DigitalGrassField extends PApplet {
+
 
 ArrayList<PVector> origins = new ArrayList<PVector>();
 
-void setup() {
+public void setup() {
     size(displayWidth, displayHeight, P3D);
-    origins = getNoiseSample(0.1, 0.38, 10); // get samples
+    origins = getNoiseSample(0.1f, 0.38f, 10); // get samples
 }
 
-void draw() {
+public void draw() {
     colorMode(RGB);
     background(0);
     stroke(100);
 
-    float fov = PI/2.0;
-    float cameraZ = (height/2.0) / tan(fov/2.0);
-    float aspect = float(width)/float(height);
-    float zNear = cameraZ/69.2;
-    float zFar = cameraZ/1.0;
+    float fov = PI/2.0f;
+    float cameraZ = (height/2.0f) / tan(fov/2.0f);
+    float aspect = PApplet.parseFloat(width)/PApplet.parseFloat(height);
+    float zNear = cameraZ/69.2f;
+    float zFar = cameraZ/1.0f;
     perspective(fov, aspect, zNear, zFar);
 
     beginCamera();
     camera();
-    rotateX(PI/3.73);
+    rotateX(PI/3.73f);
     translate(0, 351, 157);
     endCamera();
 
     int len = 13; // length of grass
     int amp = 7; // amplitude of vibrations
     int hill = 11; // amplitude of height
-    float nR = 0.01; // noise for length
-    float aR = 0.02; // noise for vibration
+    float nR = 0.01f; // noise for length
+    float aR = 0.02f; // noise for vibration
     for (int i = 0; i < origins.size (); i++) {
         float x = origins.get(i).x;
         float y = origins.get(i).y;
@@ -42,12 +58,12 @@ void draw() {
         // colorize
         colorMode(HSB, 360, 1, 1);
         noStroke();
-        fill(color(236, 0.21, pow(noise(x*aR, frameCount*aR), 1.7) + pow(noise(y*aR, frameCount*aR), 1.5)));
+        fill(color(236, 0.21f, pow(noise(x*aR, frameCount*aR), 1.7f) + pow(noise(y*aR, frameCount*aR), 1.5f)));
 
         // triangles
         beginShape(TRIANGLES);
         vertex(x, y, hillShift);
-        vertex(x + 0.5, y + 0.5, hillShift);
+        vertex(x + 0.5f, y + 0.5f, hillShift);
         vertex(x + xShift, y + yShift, l +  hillShift);
         endShape();
 
@@ -61,7 +77,7 @@ void draw() {
 }
 
 
-ArrayList<PVector> getNoiseSample(float noiseScale, float noiseThreshold, int gridStep) {
+public ArrayList<PVector> getNoiseSample(float noiseScale, float noiseThreshold, int gridStep) {
     /** Return an array of 2D-samples within display bounds
      *  noiseScale     - scale for Perlin noise
      *  noiseThreshold - threshold for setting on a sample
@@ -73,7 +89,7 @@ ArrayList<PVector> getNoiseSample(float noiseScale, float noiseThreshold, int gr
         for (int x = 0; x < width; x += gridStep) {
             float test = noise(x, y);
             if (test > noiseThreshold) {
-                float angle =  6.28 * random(1);
+                float angle =  6.28f * random(1);
                 float r =  gridStep * random(1);
                 float pointX = x + r * cos(angle);
                 float pointY = y + r * sin(angle);
@@ -82,4 +98,13 @@ ArrayList<PVector> getNoiseSample(float noiseScale, float noiseThreshold, int gr
         }
     }
     return points;
+}
+    static public void main(String[] passedArgs) {
+        String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--stop-color=#cccccc", "DigitalGrassField" };
+        if (passedArgs != null) {
+          PApplet.main(concat(appletArgs, passedArgs));
+        } else {
+          PApplet.main(appletArgs);
+        }
+    }
 }
